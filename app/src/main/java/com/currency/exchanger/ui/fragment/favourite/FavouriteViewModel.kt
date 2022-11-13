@@ -6,6 +6,7 @@ import com.currency.exchanger.data.favourite.FavouriteData
 import com.currency.exchanger.domain.currency.GetAllCurrencyUseCase
 import com.currency.exchanger.domain.favourite.DeleteFavouriteUseCase
 import com.currency.exchanger.domain.favourite.GetFavouritesUseCase
+import com.currency.exchanger.utils.DataStoreManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -14,7 +15,8 @@ import javax.inject.Inject
 class FavouriteViewModel @Inject constructor(
     private val getAllCurrencyUseCase: GetAllCurrencyUseCase,
     private val deleteFavouriteUseCase: DeleteFavouriteUseCase,
-    private val getFavouritesUseCase: GetFavouritesUseCase
+    private val getFavouritesUseCase: GetFavouritesUseCase,
+    val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
     private val _popularLiveData = MutableLiveData<CurrencyResponse>()

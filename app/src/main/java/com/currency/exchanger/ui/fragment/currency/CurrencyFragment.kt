@@ -45,7 +45,6 @@ class CurrencyFragment : Fragment() {
         }.attach()
     }
 
-
     class ViewPagerAdapter(fa: FragmentActivity) : FragmentStateAdapter(fa) {
         override fun getItemCount() = 2
 

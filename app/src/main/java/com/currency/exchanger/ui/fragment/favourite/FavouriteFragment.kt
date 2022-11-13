@@ -8,6 +8,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,7 +18,7 @@ import com.currency.exchanger.data.currency.CurrencyResponse
 import com.currency.exchanger.data.favourite.FavouriteData
 import com.currency.exchanger.databinding.FragmentFavouriteBinding
 import com.currency.exchanger.ui.fragment.favourite.FavouriteFragment.DeleteFavouriteCallback
-import com.currency.exchanger.utils.SharedPreferences.sorting
+import com.currency.exchanger.utils.DataStoreManager
 import com.currency.exchanger.utils.showToastLong
 import com.currency.exchanger.utils.toGone
 import com.currency.exchanger.utils.toVisible
@@ -49,24 +50,7 @@ class FavouriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        val pref = requireContext().sorting
-        if (mapPopular.isNotEmpty() && lastSortPref != pref) {
-            lastSortPref = pref
-            val list = mapPopular.map {
-                CurrencyData(it.key, it.value, listFavourites.contains(it.key))
-            }.filter { listFavourites.contains(it.name) }
-            when (pref) {
-                1 -> list.sortedBy { it.rate }
-                2 -> list.sortedBy { it.rate }.reversed()
-                3 -> list.sortedBy { it.name }
-                4 -> list.sortedBy { it.name }.reversed()
-            }
-            adapter?.repopulateData(list)
-        }
+        observeSortPref()
     }
 
     private fun initView() {
@@ -94,6 +78,23 @@ class FavouriteFragment : Fragment() {
         }
     }
 
+    private fun observeSortPref() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            viewModel.dataStoreManager.getFromDataStore().asLiveData().observe(viewLifecycleOwner) { preferences ->
+                preferences[DataStoreManager.NAME]?.let { pref ->
+                    if (mapPopular.isNotEmpty() && lastSortPref != pref) {
+                        lastSortPref = pref
+                        val list = mapPopular.filter { listFavourites.contains(it.key) }.map {
+                            CurrencyData(it.key, it.value, listFavourites.contains(it.key))
+                        }
+                        val result = sortListByPref(list)
+                        adapter?.repopulateData(result)
+                    }
+                }
+            }
+        }
+    }
+
     private fun observe() {
         lifecycleScope.launch(Dispatchers.Main) {
             viewModel.getAllFavourite().observe(viewLifecycleOwner) { it ->
@@ -101,7 +102,8 @@ class FavouriteFragment : Fragment() {
                 val list = mapPopular.filter { listFavourites.contains(it.key) }.map {
                     CurrencyData(it.key, it.value, listFavourites.contains(it.key))
                 }
-                adapter?.repopulateData(list)
+                val result = sortListByPref(list)
+                adapter?.repopulateData(result)
             }
             viewModel.popularLiveData.observe(viewLifecycleOwner) { response ->
                 when (response) {
@@ -115,9 +117,10 @@ class FavouriteFragment : Fragment() {
                             val list = rates.filter { listFavourites.contains(it.key) }.map {
                                 CurrencyData(it.key, it.value, listFavourites.contains(it.key))
                             }
-                            adapter?.repopulateData(list) ?: run {
+                            val result = sortListByPref(list)
+                            adapter?.repopulateData(result) ?: run {
                                 binding.recycler.layoutManager = LinearLayoutManager(requireContext())
-                                adapter = FavouriteAdapter(list, callback)
+                                adapter = FavouriteAdapter(result, callback)
                                 binding.recycler.adapter = adapter
                             }
                             binding.progressBar.toGone()
@@ -152,6 +155,17 @@ class FavouriteFragment : Fragment() {
             viewModel.getPopularCurrency(currency)
 
         }
+    }
+
+    private fun sortListByPref(list: List<CurrencyData>): List<CurrencyData> {
+        val result = mutableListOf<CurrencyData>()
+        when (lastSortPref) {
+            1 -> result.addAll(list.sortedBy { it.rate })
+            2 -> result.addAll(list.sortedBy { it.rate }.reversed())
+            3 -> result.addAll(list.sortedBy { it.name })
+            4 -> result.addAll(list.sortedBy { it.name }.reversed())
+        }
+        return result
     }
 
     fun interface DeleteFavouriteCallback {

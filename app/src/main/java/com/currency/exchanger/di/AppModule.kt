@@ -3,7 +3,7 @@ package com.currency.exchanger.di
 import android.content.Context
 import com.currency.exchanger.core.cache.AppDatabase
 import com.currency.exchanger.core.cloud.ApiService
-import com.currency.exchanger.utils.SharedPreferences
+import com.currency.exchanger.utils.DataStoreManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,5 +23,6 @@ class AppModule {
     fun provideAppDatabase(@ApplicationContext context: Context) = AppDatabase.getDatabase(context)
 
     @Provides
-    fun provideSharedPreferences(@ApplicationContext context: Context) = SharedPreferences.getSharedPreference(context)
+    @Singleton
+    fun provideDataStore(@ApplicationContext context: Context) = DataStoreManager(context)
 }

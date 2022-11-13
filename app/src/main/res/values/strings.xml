@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Currency Exchanger</string>
+    <string name="popular">Popular</string>
+    <string name="favourite">Favourite</string>
+    <string name="sorting">Sorting</string>
+    <string name="from_min_to_max">From min to max</string>
+    <string name="from_max_to_min">From max to min</string>
+    <string name="sort_abc">Alphabetical sorting</string>
+    <string name="sort_cba">Reverse alphabetical sorting </string>
+</resources>

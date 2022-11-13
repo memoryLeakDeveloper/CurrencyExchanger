@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/currencyFragment">
+    <fragment
+        android:id="@+id/currencyFragment"
+        android:name="com.currency.exchanger.ui.fragment.currency.CurrencyFragment"
+        android:label="CurrencyFragment" >
+        <action
+            android:id="@+id/action_currencyFragment_to_sortingFragment"
+            app:destination="@id/sortingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/sortingFragment"
+        android:name="com.currency.exchanger.ui.fragment.sorting.SortingFragment"
+        android:label="SortingFragment" >
+        <action
+            android:id="@+id/action_sortingFragment_to_currencyFragment"
+            app:destination="@id/currencyFragment" />
+    </fragment>
+</navigation>

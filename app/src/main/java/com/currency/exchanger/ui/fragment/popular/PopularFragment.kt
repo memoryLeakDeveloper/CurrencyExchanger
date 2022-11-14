@@ -25,6 +25,8 @@ import com.currency.exchanger.utils.toVisible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.net.ConnectException
+import java.net.UnknownHostException
 
 @AndroidEntryPoint
 class PopularFragment : Fragment() {
@@ -68,7 +70,11 @@ class PopularFragment : Fragment() {
                         observe()
                     }
                     is CurrencyResponse.Failure -> {
-                        requireContext().showToastLong("Ошибка")
+                        if (response.e is UnknownHostException || response.e is ConnectException)
+                            requireContext().showToastLong(R.string.please_restart_app_with_internet)
+                        else
+                            requireContext().showToastLong(R.string.unknown_exception)
+                        binding.progressBar.toGone()
                     }
                 }
             }

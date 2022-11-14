@@ -7,4 +7,6 @@
     <string name="from_max_to_min">От макс к мин</string>
     <string name="sort_abc">В алфавитном порядке</string>
     <string name="sort_cba">В обратном алфавитном порядке</string>
+    <string name="unknown_exception">Неизвестная ошибка</string>
+    <string name="please_restart_app_with_internet">Пожалуйста перезапустите приложение с интернетом</string>
 </resources>

@@ -89,6 +89,7 @@ class FavouriteFragment : Fragment() {
                         }
                         val result = sortListByPref(list)
                         adapter?.repopulateData(result)
+                        binding.recycler.scrollToPosition(0)
                     }
                 }
             }

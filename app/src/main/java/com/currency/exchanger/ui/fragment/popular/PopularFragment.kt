@@ -87,14 +87,9 @@ class PopularFragment : Fragment() {
                         val list = mapPopular.map {
                             CurrencyData(it.key, it.value, listFavourites.contains(it.key))
                         }
-                        val result = mutableListOf<CurrencyData>()
-                        when (pref) {
-                            1 -> result.addAll(list.sortedBy { it.rate })
-                            2 -> result.addAll(list.sortedBy { it.rate }.reversed())
-                            3 -> result.addAll(list.sortedBy { it.name })
-                            4 -> result.addAll(list.sortedBy { it.name }.reversed())
-                        }
+                        val result = sortListByPref(list)
                         adapter?.repopulateData(result)
+                        binding.recycler.scrollToPosition(0)
                     }
                 }
             }

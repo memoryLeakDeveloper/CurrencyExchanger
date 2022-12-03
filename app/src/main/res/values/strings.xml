@@ -7,4 +7,6 @@
     <string name="from_max_to_min">From max to min</string>
     <string name="sort_abc">Alphabetical sorting</string>
     <string name="sort_cba">Reverse alphabetical sorting </string>
+    <string name="unknown_exception">Unknown exception</string>
+    <string name="please_restart_app_with_internet">Please restart app with internet</string>
 </resources>

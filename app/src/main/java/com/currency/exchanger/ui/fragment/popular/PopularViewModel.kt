@@ -1,7 +1,10 @@
 package com.currency.exchanger.ui.fragment.popular
 
-import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import com.currency.exchanger.data.currency.CurrencyData
 import com.currency.exchanger.data.currency.CurrencyResponse
 import com.currency.exchanger.data.favourite.FavouriteData
 import com.currency.exchanger.domain.currency.GetAllCurrencyUseCase
@@ -9,7 +12,6 @@ import com.currency.exchanger.domain.favourite.GetFavouritesUseCase
 import com.currency.exchanger.domain.favourite.SaveFavouriteUseCase
 import com.currency.exchanger.utils.DataStoreManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,20 +22,35 @@ class PopularViewModel @Inject constructor(
     val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
+    var lastSortPref = 3
+    var mapPopular = mutableMapOf<String, Double>()
+    var listFavourites = mutableListOf<String>()
+
     private val _popularLiveData = MutableLiveData<CurrencyResponse>()
     val popularLiveData = _popularLiveData
 
     suspend fun getPopularCurrency(query: String?): LiveData<CurrencyResponse> {
-        viewModelScope.launch {
-            getAllCurrencyUseCase.invoke(query).collect {
-                _popularLiveData.postValue(it)
-            }
+        getAllCurrencyUseCase.invoke(query).collect {
+            _popularLiveData.postValue(it)
         }
         return getAllCurrencyUseCase.invoke(query).asLiveData()
     }
 
+    fun getDataStoreLiveData() = dataStoreManager.getFromDataStore().asLiveData()
+
     suspend fun saveFavourite(data: FavouriteData) = saveFavouriteUseCase.invoke(data)
 
     fun getAllFavourite() = getFavouritesUseCase.invoke().asLiveData()
+
+    fun sortListByPref(list: List<CurrencyData>): List<CurrencyData> {
+        val result = mutableListOf<CurrencyData>()
+        when (lastSortPref) {
+            1 -> result.addAll(list.sortedBy { it.rate })
+            2 -> result.addAll(list.sortedBy { it.rate }.reversed())
+            3 -> result.addAll(list.sortedBy { it.name })
+            4 -> result.addAll(list.sortedBy { it.name }.reversed())
+        }
+        return result
+    }
 
 }

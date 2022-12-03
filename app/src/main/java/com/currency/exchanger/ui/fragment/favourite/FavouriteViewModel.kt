@@ -1,6 +1,7 @@
 package com.currency.exchanger.ui.fragment.favourite
 
 import androidx.lifecycle.*
+import com.currency.exchanger.data.currency.CurrencyData
 import com.currency.exchanger.data.currency.CurrencyResponse
 import com.currency.exchanger.data.favourite.FavouriteData
 import com.currency.exchanger.domain.currency.GetAllCurrencyUseCase
@@ -19,6 +20,10 @@ class FavouriteViewModel @Inject constructor(
     val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
+    var mapPopular = mutableMapOf<String, Double>()
+    var listFavourites = mutableListOf<String>()
+    var lastSortPref = 3
+
     private val _popularLiveData = MutableLiveData<CurrencyResponse>()
     val popularLiveData = _popularLiveData
 
@@ -34,5 +39,20 @@ class FavouriteViewModel @Inject constructor(
     suspend fun deleteFavourite(data: FavouriteData) = deleteFavouriteUseCase.invoke(data)
 
     fun getAllFavourite() = getFavouritesUseCase.invoke().asLiveData()
+
+    fun sortListByPref(list: List<CurrencyData>): List<CurrencyData> {
+        val result = mutableListOf<CurrencyData>()
+        when (lastSortPref) {
+            1 -> result.addAll(list.sortedBy { it.rate })
+            2 -> result.addAll(list.sortedBy { it.rate }.reversed())
+            3 -> result.addAll(list.sortedBy { it.name })
+            4 -> result.addAll(list.sortedBy { it.name }.reversed())
+        }
+        return result
+    }
+
+    fun sortListContainsInDb() = mapPopular
+        .filter { listFavourites.contains(it.key) }
+        .map { CurrencyData(it.key, it.value, listFavourites.contains(it.key)) }
 
 }

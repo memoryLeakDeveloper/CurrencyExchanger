@@ -32,10 +32,7 @@ class FavouriteFragment : Fragment() {
     private lateinit var binding: FragmentFavouriteBinding
     private val viewModel: FavouriteViewModel by viewModels()
     private var adapter: FavouriteAdapter? = null
-    private var lastSortPref = 3
     private var spinnerAdapter: ArrayAdapter<String>? = null
-    private var mapPopular = mutableMapOf<String, Double>()
-    private var listFavourites = mutableListOf<String>()
     private val callback = DeleteFavouriteCallback {
         lifecycleScope.launch(Dispatchers.Main) {
             viewModel.deleteFavourite(FavouriteData(it))
@@ -79,57 +76,46 @@ class FavouriteFragment : Fragment() {
     }
 
     private fun observeSortPref() {
-        lifecycleScope.launch(Dispatchers.Main) {
-            viewModel.dataStoreManager.getFromDataStore().asLiveData().observe(viewLifecycleOwner) { preferences ->
-                preferences[DataStoreManager.NAME]?.let { pref ->
-                    if (mapPopular.isNotEmpty() && lastSortPref != pref) {
-                        lastSortPref = pref
-                        val list = mapPopular.filter { listFavourites.contains(it.key) }.map {
-                            CurrencyData(it.key, it.value, listFavourites.contains(it.key))
-                        }
-                        val result = sortListByPref(list)
-                        adapter?.repopulateData(result)
-                    }
+        viewModel.dataStoreManager.getFromDataStore().asLiveData().observe(viewLifecycleOwner) { preferences ->
+            preferences[DataStoreManager.NAME]?.let { pref ->
+                if (viewModel.mapPopular.isNotEmpty() && viewModel.lastSortPref != pref) {
+                    viewModel.lastSortPref = pref
+                    val list = viewModel.sortListContainsInDb()
+                    adapter?.repopulateData(viewModel.sortListByPref(list))
                 }
             }
         }
     }
 
     private fun observe() {
-        lifecycleScope.launch(Dispatchers.Main) {
-            viewModel.getAllFavourite().observe(viewLifecycleOwner) { it ->
-                listFavourites = it.map { it.name }.toMutableList()
-                val list = mapPopular.filter { listFavourites.contains(it.key) }.map {
-                    CurrencyData(it.key, it.value, listFavourites.contains(it.key))
+        viewModel.getAllFavourite().observe(viewLifecycleOwner) { it ->
+            viewModel.listFavourites = it.map { it.name }.toMutableList()
+            val list = viewModel.sortListContainsInDb()
+            val result = viewModel.sortListByPref(list)
+            adapter?.repopulateData(result)
+        }
+        viewModel.popularLiveData.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is CurrencyResponse.Loading -> {
+                    binding.progressBar.toVisible()
                 }
-                val result = sortListByPref(list)
-                adapter?.repopulateData(result)
-            }
-            viewModel.popularLiveData.observe(viewLifecycleOwner) { response ->
-                when (response) {
-                    is CurrencyResponse.Loading -> {
-                        binding.progressBar.toVisible()
-                    }
-                    is CurrencyResponse.Success -> {
-                        val rates = response.data.rates
-                        if (rates?.isNotEmpty() == true) {
-                            mapPopular = rates.toMutableMap()
-                            val list = rates.filter { listFavourites.contains(it.key) }.map {
-                                CurrencyData(it.key, it.value, listFavourites.contains(it.key))
-                            }
-                            val result = sortListByPref(list)
-                            adapter?.repopulateData(result) ?: run {
-                                binding.recycler.layoutManager = LinearLayoutManager(requireContext())
-                                adapter = FavouriteAdapter(result, callback)
-                                binding.recycler.adapter = adapter
-                            }
-                            binding.progressBar.toGone()
+                is CurrencyResponse.Success -> {
+                    val rates = response.data.rates
+                    if (rates?.isNotEmpty() == true) {
+                        viewModel.mapPopular = rates.toMutableMap()
+                        val list = viewModel.sortListContainsInDb()
+                        val result = viewModel.sortListByPref(list)
+                        adapter?.repopulateData(result) ?: run {
+                            binding.recycler.layoutManager = LinearLayoutManager(requireContext())
+                            adapter = FavouriteAdapter(result, callback)
+                            binding.recycler.adapter = adapter
                         }
-                    }
-                    is CurrencyResponse.Failure -> {
-                        requireContext().showToastLong("Ошибка")
                         binding.progressBar.toGone()
                     }
+                }
+                is CurrencyResponse.Failure -> {
+                    requireContext().showToastLong("Ошибка")
+                    binding.progressBar.toGone()
                 }
             }
         }
@@ -155,17 +141,6 @@ class FavouriteFragment : Fragment() {
             viewModel.getPopularCurrency(currency)
 
         }
-    }
-
-    private fun sortListByPref(list: List<CurrencyData>): List<CurrencyData> {
-        val result = mutableListOf<CurrencyData>()
-        when (lastSortPref) {
-            1 -> result.addAll(list.sortedBy { it.rate })
-            2 -> result.addAll(list.sortedBy { it.rate }.reversed())
-            3 -> result.addAll(list.sortedBy { it.name })
-            4 -> result.addAll(list.sortedBy { it.name }.reversed())
-        }
-        return result
     }
 
     fun interface DeleteFavouriteCallback {

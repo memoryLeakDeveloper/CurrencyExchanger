@@ -6,14 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.lifecycleScope
 import com.currency.exchanger.R
 import com.currency.exchanger.databinding.FragmentSortingBinding
 import com.currency.exchanger.utils.DataStoreManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SortingFragment : Fragment() {
@@ -28,41 +24,32 @@ class SortingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        lifecycleScope.launch(Dispatchers.Main) {
-            viewModel.dataStoreManager.getFromDataStore().asLiveData().observe(viewLifecycleOwner) {
-                val checkedRadioButton =
-                    when (it[DataStoreManager.NAME]) {
-                        1 -> R.id.radio_min_to_max
-                        2 -> R.id.radio_max_to_min
-                        3 -> R.id.radio_abc
-                        else -> R.id.radio_cba
-                    }
-                binding.group.check(checkedRadioButton)
-            }
-        }
+        initView()
+        observePref()
+    }
+
+    private fun initView() {
         binding.group.setOnCheckedChangeListener { _, button ->
-            when (button) {
-                R.id.radio_min_to_max -> {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        viewModel.dataStoreManager.saveToDataStore(1)
-                    }
-                }
-                R.id.radio_max_to_min -> {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        viewModel.dataStoreManager.saveToDataStore(2)
-                    }
-                }
-                R.id.radio_abc -> {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        viewModel.dataStoreManager.saveToDataStore(3)
-                    }
-                }
-                R.id.radio_cba -> {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        viewModel.dataStoreManager.saveToDataStore(4)
-                    }
-                }
+            val pref = when (button) {
+                R.id.radio_min_to_max -> 1
+                R.id.radio_max_to_min -> 2
+                R.id.radio_abc -> 3
+                else -> 4
             }
+            viewModel.updateSortPref(pref)
         }
     }
+
+    private fun observePref() {
+        viewModel.dataStoreManagerLiveData().observe(viewLifecycleOwner) {
+            val checkedRadioButton = when (it[DataStoreManager.NAME]) {
+                1 -> R.id.radio_min_to_max
+                2 -> R.id.radio_max_to_min
+                3 -> R.id.radio_abc
+                else -> R.id.radio_cba
+            }
+            binding.group.check(checkedRadioButton)
+        }
+    }
+
 }

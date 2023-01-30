@@ -13,11 +13,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.currency.exchanger.R
-import com.currency.exchanger.data.currency.CurrencyData
 import com.currency.exchanger.data.currency.CurrencyResponse
 import com.currency.exchanger.data.favourite.FavouriteData
 import com.currency.exchanger.databinding.FragmentFavouriteBinding
-import com.currency.exchanger.ui.fragment.favourite.FavouriteFragment.DeleteFavouriteCallback
 import com.currency.exchanger.utils.DataStoreManager
 import com.currency.exchanger.utils.showToastLong
 import com.currency.exchanger.utils.toGone
@@ -33,7 +31,7 @@ class FavouriteFragment : Fragment() {
     private val viewModel: FavouriteViewModel by viewModels()
     private var adapter: FavouriteAdapter? = null
     private var spinnerAdapter: ArrayAdapter<String>? = null
-    private val callback = DeleteFavouriteCallback {
+    private val callback: (String) -> Unit = {
         lifecycleScope.launch(Dispatchers.Main) {
             viewModel.deleteFavourite(FavouriteData(it))
         }
@@ -143,7 +141,4 @@ class FavouriteFragment : Fragment() {
         }
     }
 
-    fun interface DeleteFavouriteCallback {
-        fun delete(name: String)
-    }
 }

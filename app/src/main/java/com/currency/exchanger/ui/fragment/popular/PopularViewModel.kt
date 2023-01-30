@@ -6,19 +6,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.currency.exchanger.data.currency.CurrencyData
 import com.currency.exchanger.data.currency.CurrencyResponse
+import com.currency.exchanger.data.currency.usecases.GetAllCurrencyUseCaseImpl
 import com.currency.exchanger.data.favourite.FavouriteData
-import com.currency.exchanger.domain.currency.GetAllCurrencyUseCase
-import com.currency.exchanger.domain.favourite.GetFavouritesUseCase
-import com.currency.exchanger.domain.favourite.SaveFavouriteUseCase
+import com.currency.exchanger.data.favourite.usecases.GetFavouritesUseCaseImpl
+import com.currency.exchanger.data.favourite.usecases.SaveFavouriteUseCaseImpl
 import com.currency.exchanger.utils.DataStoreManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class PopularViewModel @Inject constructor(
-    private val getAllCurrencyUseCase: GetAllCurrencyUseCase,
-    private val getFavouritesUseCase: GetFavouritesUseCase,
-    private val saveFavouriteUseCase: SaveFavouriteUseCase,
+    private val getAllCurrencyUseCase: GetAllCurrencyUseCaseImpl,
+    private val getFavouritesUseCase: GetFavouritesUseCaseImpl,
+    private val saveFavouriteUseCase: SaveFavouriteUseCaseImpl,
     val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 

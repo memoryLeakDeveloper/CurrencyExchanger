@@ -11,7 +11,7 @@ import com.currency.exchanger.data.currency.CurrencyData
 import com.currency.exchanger.databinding.ItemPopularBinding
 import com.currency.exchanger.utils.setDrawable
 
-class FavouriteAdapter(private var list: List<CurrencyData>, private val callback: FavouriteFragment.DeleteFavouriteCallback) :
+class FavouriteAdapter(private var list: List<CurrencyData>, private val callback: (String) -> Unit) :
     RecyclerView.Adapter<FavouriteAdapter.ViewHolder>() {
 
     private var lastPosition = -1
@@ -36,7 +36,7 @@ class FavouriteAdapter(private var list: List<CurrencyData>, private val callbac
             value.text = item.rate.toString()
             button.setDrawable(R.drawable.ic_favourite)
             button.setOnClickListener {
-                callback.delete(item.name)
+                callback.invoke(item.name)
             }
         }
     }

@@ -4,9 +4,9 @@ import com.currency.exchanger.core.cache.AppDatabase
 import com.currency.exchanger.data.favourite.FavouriteCacheToDataMapper
 import com.currency.exchanger.data.favourite.FavouriteDataToCacheMapper
 import com.currency.exchanger.data.favourite.FavouriteRepositoryImpl
-import com.currency.exchanger.domain.favourite.DeleteFavouriteUseCase
-import com.currency.exchanger.domain.favourite.GetFavouritesUseCase
-import com.currency.exchanger.domain.favourite.SaveFavouriteUseCase
+import com.currency.exchanger.data.favourite.usecases.DeleteFavouriteUseCaseImpl
+import com.currency.exchanger.data.favourite.usecases.GetFavouritesUseCaseImpl
+import com.currency.exchanger.data.favourite.usecases.SaveFavouriteUseCaseImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,16 +18,16 @@ import javax.inject.Singleton
 class FavouriteModule {
 
     @Provides
-    fun provideDeleteFavouriteUseCase(repository: FavouriteRepositoryImpl, mapper: FavouriteDataToCacheMapper) =
-        DeleteFavouriteUseCase(repository, mapper)
+    fun provideDeleteFavouriteUseCaseImpl(repository: FavouriteRepositoryImpl, mapper: FavouriteDataToCacheMapper) =
+        DeleteFavouriteUseCaseImpl(repository, mapper)
 
     @Provides
-    fun provideGetFavouriteUseCase(repository: FavouriteRepositoryImpl, mapper: FavouriteCacheToDataMapper) =
-        GetFavouritesUseCase(repository, mapper)
+    fun provideGetFavouriteUseCaseImpl(repository: FavouriteRepositoryImpl, mapper: FavouriteCacheToDataMapper) =
+        GetFavouritesUseCaseImpl(repository, mapper)
 
     @Provides
-    fun provideSaveFavouriteUseCase(repository: FavouriteRepositoryImpl, mapper: FavouriteDataToCacheMapper) =
-        SaveFavouriteUseCase(repository, mapper)
+    fun provideSaveFavouriteUseCaseImpl(repository: FavouriteRepositoryImpl, mapper: FavouriteDataToCacheMapper) =
+        SaveFavouriteUseCaseImpl(repository, mapper)
 
     @Provides
     fun provideCacheToDataMapper() = FavouriteCacheToDataMapper()

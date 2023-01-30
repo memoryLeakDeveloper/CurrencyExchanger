@@ -1,9 +1,9 @@
 package com.currency.exchanger.domain.currency
 
-import com.currency.exchanger.data.currency.CurrencyRepositoryImpl
-import javax.inject.Inject
+import com.currency.exchanger.data.currency.CurrencyResponse
+import kotlinx.coroutines.flow.Flow
 
-class GetAllCurrencyUseCase @Inject constructor(private val repository: CurrencyRepositoryImpl) {
+interface GetAllCurrencyUseCase {
 
-    suspend fun invoke(query: String?) = repository.getAllCurrency(query)
+    suspend fun invoke(query: String?): Flow<CurrencyResponse>
 }

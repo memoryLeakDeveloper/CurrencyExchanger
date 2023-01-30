@@ -3,10 +3,10 @@ package com.currency.exchanger.ui.fragment.favourite
 import androidx.lifecycle.*
 import com.currency.exchanger.data.currency.CurrencyData
 import com.currency.exchanger.data.currency.CurrencyResponse
+import com.currency.exchanger.data.currency.usecases.GetAllCurrencyUseCaseImpl
 import com.currency.exchanger.data.favourite.FavouriteData
-import com.currency.exchanger.domain.currency.GetAllCurrencyUseCase
-import com.currency.exchanger.domain.favourite.DeleteFavouriteUseCase
-import com.currency.exchanger.domain.favourite.GetFavouritesUseCase
+import com.currency.exchanger.data.favourite.usecases.DeleteFavouriteUseCaseImpl
+import com.currency.exchanger.data.favourite.usecases.GetFavouritesUseCaseImpl
 import com.currency.exchanger.utils.DataStoreManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -14,9 +14,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavouriteViewModel @Inject constructor(
-    private val getAllCurrencyUseCase: GetAllCurrencyUseCase,
-    private val deleteFavouriteUseCase: DeleteFavouriteUseCase,
-    private val getFavouritesUseCase: GetFavouritesUseCase,
+    private val getAllCurrencyUseCase: GetAllCurrencyUseCaseImpl,
+    private val deleteFavouriteUseCase: DeleteFavouriteUseCaseImpl,
+    private val getFavouritesUseCase: GetFavouritesUseCaseImpl,
     val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 

@@ -3,7 +3,6 @@ package com.currency.exchanger.ui.fragment.popular
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.currency.exchanger.R
@@ -11,7 +10,7 @@ import com.currency.exchanger.data.currency.CurrencyData
 import com.currency.exchanger.databinding.ItemPopularBinding
 import com.currency.exchanger.utils.setDrawable
 
-class PopularAdapter(private var list: List<CurrencyData>, private val callback: PopularFragment.AddFavouriteCallback) :
+class PopularAdapter(private var list: List<CurrencyData>, private val callback: (String) -> Unit) :
     RecyclerView.Adapter<PopularAdapter.ViewHolder>() {
 
     private var lastPosition = -1
@@ -24,12 +23,12 @@ class PopularAdapter(private var list: List<CurrencyData>, private val callback:
 
     @SuppressLint("SetTextI18n", "ResourceType")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val animation = AnimationUtils.loadAnimation(
-            holder.itemView.context,
-            if (position < lastPosition) R.xml.down_from_top else R.xml.up_from_bottom
-        )
-        lastPosition = holder.bindingAdapterPosition
-        holder.itemView.startAnimation(animation)
+//        val animation = AnimationUtils.loadAnimation(
+//            holder.itemView.context,
+//            if (position < lastPosition) R.xml.down_from_top else R.xml.up_from_bottom
+//        )
+//        lastPosition = holder.bindingAdapterPosition
+//        holder.itemView.startAnimation(animation)
         val item = list[position]
         with(holder.binding) {
             name.text = item.name
@@ -37,7 +36,7 @@ class PopularAdapter(private var list: List<CurrencyData>, private val callback:
             button.setDrawable(if (item.isFavourite) R.drawable.ic_favourite else R.drawable.ic_popular)
             button.setOnClickListener {
                 if (!item.isFavourite) {
-                    callback.add(item.name)
+                    callback.invoke(item.name)
                     button.setDrawable(R.drawable.ic_favourite)
                 }
             }
@@ -48,7 +47,7 @@ class PopularAdapter(private var list: List<CurrencyData>, private val callback:
 
     override fun onViewDetachedFromWindow(holder: ViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        holder.itemView.clearAnimation()
+//        holder.itemView.clearAnimation()
     }
 
     fun repopulateData(list: List<CurrencyData>) {

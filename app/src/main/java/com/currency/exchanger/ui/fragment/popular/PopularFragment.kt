@@ -16,7 +16,6 @@ import com.currency.exchanger.data.currency.CurrencyData
 import com.currency.exchanger.data.currency.CurrencyResponse
 import com.currency.exchanger.data.favourite.FavouriteData
 import com.currency.exchanger.databinding.FragmentPopularBinding
-import com.currency.exchanger.ui.fragment.popular.PopularFragment.AddFavouriteCallback
 import com.currency.exchanger.utils.DataStoreManager
 import com.currency.exchanger.utils.showToastLong
 import com.currency.exchanger.utils.toGone
@@ -32,7 +31,7 @@ class PopularFragment : Fragment() {
     private val viewModel: PopularViewModel by viewModels()
     private var spinnerAdapter: ArrayAdapter<String>? = null
     private var adapter: PopularAdapter? = null
-    private val callback = AddFavouriteCallback {
+    private val callback: (String) -> Unit = {
         lifecycleScope.launch(Dispatchers.Main) {
             viewModel.saveFavourite(FavouriteData(it))
         }
@@ -138,10 +137,6 @@ class PopularFragment : Fragment() {
 
     private fun getNewRates(currency: String) = lifecycleScope.launch(Dispatchers.Main) {
         viewModel.getPopularCurrency(currency)
-    }
-
-    fun interface AddFavouriteCallback {
-        fun add(name: String)
     }
 
 }
